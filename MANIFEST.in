@@ -1,0 +1,4 @@
+include README.md
+include VERSION.txt
+include requirements-testing.txt
+include requirements.txt

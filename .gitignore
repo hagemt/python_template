@@ -1,0 +1,13 @@
+*.DS_Store
+*.egg-info
+*.pyc
+*.swp
+__pycache__
+
+/*.xml
+/.*_cache
+/.coverage
+/.vscode
+/build
+/dist
+/venv

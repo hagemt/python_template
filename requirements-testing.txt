@@ -1,0 +1,12 @@
+bandit
+black
+coverage
+flake8
+flake8-bugbear
+flake8-debugger
+isort
+mypy
+pylint
+pytest
+pytest-cov
+pytest-only
