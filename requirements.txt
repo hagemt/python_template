@@ -1,1 +1,14 @@
-typing_extensions
+# try: aiohttp[speedups] if ?works with Python 3.11+
+aiohttp
+# beautifulsoup4
+# fastapi
+# matplotlib
+# networkx
+# pandas
+# prometheus-fastapi-instrumentator
+pydantic
+# sqlmodel
+typed_dotenv
+typer[all]
+# typing_extensions
+# uvicorn[standard]

@@ -1,11 +1,21 @@
-PACKAGES := $(shell find src -name __init__.py -exec dirname {} \;)
-PYTHON_3 := $(shell command -v python3)
+PACKAGES ?= $(shell find examples src -name __init__.py -exec dirname {} \;)
+PYTHON_3 ?= $(shell command -v python3)
 
-VENV_DIR := $(shell pwd)/venv
+QUESTION ?= $(shell shuf -n 1 ./examples/questions.txt)
+VENV_DIR ?= $(shell pwd)/venv
+
+app: sane
+	source '$(VENV_DIR)/bin/activate' ; \
+		python ./examples/textsynth.py <<< '$(QUESTION)'
+
+sane:
+	@[ -x '$(PYTHON_3)' ] || brew install python@3.11
+	@if [ requirements.txt -nt '$(VENV_DIR)/ok' ] ; \
+	then rm -i '$(VENV_DIR)/ok' ; make install ; fi
+.PHONY: app sane
 
 check: install
 	@make format checkstatic test
-.PHONY: check
 
 checkstatic: lint
 	$(VENV_DIR)/bin/bandit -ll -r $(PACKAGES)  # detects CVEs/etc.

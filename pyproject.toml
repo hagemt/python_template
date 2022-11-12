@@ -9,5 +9,5 @@ ignore_missing_imports = true
 
 [tool.pylint.'MESSAGES CONTROL']
 disable = ["C0116"]  # missing-function-docstring noise
-extension-pkg-allow-list = []
+extension-pkg-allow-list = ["pydantic"]
 max-line-length = 120
