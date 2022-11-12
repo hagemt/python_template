@@ -6,6 +6,7 @@ import asyncio
 import re
 import sys
 import time
+import typing
 import warnings
 
 import aiohttp
@@ -126,13 +127,13 @@ async def post(cfg: Config, txt: str, cmd="tokenize", **kwargs) -> dict:
             return data
 
 
-def split(text: str) -> list[str]:
+def split(text: str) -> typing.List[str]:
     return [t for t in re.findall(r"\w+|\W+", text) if t.strip()]
 
 
 def munge(_cmd: str, body: dict, data: dict) -> None:
     parsed = split(body.get("text", ""))
-    tokens: list[int] = data.get("tokens", [])
+    tokens: typing.List[int] = data.get("tokens", [])
     for token, raw in zip(tokens, parsed):
         print(f"{token:>10d}: {raw}")
 
