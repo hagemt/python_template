@@ -4,9 +4,9 @@
 *.swp
 __pycache__
 
-/*.xml
 /.*_cache
 /.coverage
+/.env*
 /.vscode
 /build
 /dist
