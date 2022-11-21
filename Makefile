@@ -1,6 +1,5 @@
 PACKAGES ?= $(shell find examples src -name __init__.py -exec dirname {} \;)
 PYTHON_3 ?= $(shell command -v python3)
-
 QUESTION ?= $(shell shuf -n 1 ./examples/questions.txt)
 VENV_DIR ?= $(shell pwd)/venv
 
@@ -21,13 +20,14 @@ check: install
 	@make format checkstatic test
 
 checkstatic: lint
-	$(VENV_DIR)/bin/bandit -ll -r $(PACKAGES)  # detects CVEs/etc.
-	$(VENV_DIR)/bin/mypy --ignore-missing-imports $(PACKAGES) tests
+	@# fails if CVEs or bad types are detected:
+	$(VENV_DIR)/bin/bandit -ll -r $(PACKAGES)
+	$(VENV_DIR)/bin/mypy $(PACKAGES) tests
 
 clean:
 	$(RM) -r '$(VENV_DIR)'
 	find . -name '*.pyc' -delete
-	@# ^ reduces noise
+	@# ^ may reduce noise
 	@git clean -dix
 
 dist:
@@ -35,15 +35,16 @@ dist:
 	@make check
 	$(VENV_DIR)/bin/python setup.py sdist
 	$(VENV_DIR)/bin/python setup.py bdist_wheel
+	@# add a `publish: dist` target (to taste)
 
 format: install
 	$(VENV_DIR)/bin/isort $(PACKAGES) setup.py tests
 	$(VENV_DIR)/bin/black $(PACKAGES) setup.py tests
 
 install:
-	@# ugly but effective way to bootstrap virtualenv/etc.
-	@[ -d '$(VENV_DIR)' ] || $(PYTHON_3) -m venv '$(VENV_DIR)'
-	@[ -f '$(VENV_DIR)/ok' ] || make venv.ok
+	@# an ugly but effective way to bootstrap
+	@[ -d '$(VENV_DIR)' ] || make venv
+	@[ -f '$(VENV_DIR)/ok' ] || make venv.pip
 	@touch '$(VENV_DIR)/ok'
 
 lint: install
@@ -51,11 +52,17 @@ lint: install
 	$(VENV_DIR)/bin/pylint $(PACKAGES) tests
 
 test: install
-	$(VENV_DIR)/bin/pytest --capture=tee-sys --cov
+	$(VENV_DIR)/bin/pytest tests --capture=tee-sys --cov
 	@#$(VENV_DIR)/bin/coverage report --show-missing
+	@# ^ alternative to --cov incl. uncovered lines
+.PHONY: check checkstatic clean dist format install lint test
 
-venv.ok:
+venv:
+	[ -x "$(PYTHON_3)" ] && $(PYTHON_3) -m venv '$(VENV_DIR)'
+.PHONY: venv
+
+venv.pip:
 	source '$(VENV_DIR)/bin/activate' ; \
 		pip install -U pip wheel && pip install -e '.[testing]' \
 		&& mypy --install-types --non-interactive $(PACKAGES) tests
-.PHONY: check checkstatic clean dist format install lint test venv.ok
+.PHONY: venv.pip

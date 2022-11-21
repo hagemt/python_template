@@ -10,7 +10,7 @@ try:
     package = pkg_resources.require("hagemt_template")
     version = package[0].version
 except pkg_resources.DistributionNotFound:
-    version = os.getenv("HAGEMT_VERSION", "development")
+    version = os.getenv("HAGEMT_TEMPLATE_VERSION", "development")
 
 __all__ = (
     "package",
