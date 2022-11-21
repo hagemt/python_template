@@ -1,6 +1,20 @@
-PACKAGES ?= $(shell find src -name __init__.py -exec dirname {} \;)
+PACKAGES ?= $(shell find examples src -name __init__.py -exec dirname {} \;)
 PYTHON_3 ?= $(shell command -v python3)
+QUESTION ?= $(shell shuf -n 1 ./examples/questions.txt)
 VENV_DIR ?= $(shell pwd)/venv
+
+app: demo
+	@# TODO: serve some endpoints for various webhooks
+
+demo: sane
+	source '$(VENV_DIR)/bin/activate' ; \
+		python ./examples/textsynth.py <<< '$(QUESTION)'
+
+sane:
+	@[ -x '$(PYTHON_3)' ] || brew install python@3.11
+	@if [ requirements.txt -nt '$(VENV_DIR)/ok' ] ; \
+	then rm -i '$(VENV_DIR)/ok' ; make install ; fi
+.PHONY: app demo sane
 
 check: install
 	@make format checkstatic test
